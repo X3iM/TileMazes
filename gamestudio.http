@@ -1,0 +1,9 @@
+POST http://localhost:8080/tileMazes
+Content-Type: application/json
+
+{
+  "game": "tileMazes",
+  "player": "Bob",
+  "points": 100,
+  "playerOn": "2020-04-15T20:30:33"
+}
