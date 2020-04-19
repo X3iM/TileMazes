@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommentServiceRestClient implements CommentService {
-    private static final String URL = "http://localhost:8080/api/score";
+    private static final String URL = "http://localhost:8080/api/comment";
 
     private RestTemplate restTemplate = new RestTemplate();
 

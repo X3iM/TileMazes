@@ -96,7 +96,7 @@ public class ConsoleUI {
             System.out.println(("Congratulations! You completed this level in " + min +" minutes, " + seconds +" seconds"));
             countOfScore();
             addScore();
-            //analyzer.addComment(commentService, userName);
+            analyzer.addComment(commentService, userName);
             analyzer.addRating(ratingService, userName);
 
             if (!analyzer.endLevel(time))

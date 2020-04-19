@@ -1,5 +1,6 @@
 package sk.tuke.gamestudio;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import sk.tuke.gamestudio.game.consoleui.ConsoleUI;
 import sk.tuke.gamestudio.service.*;
 import org.springframework.boot.CommandLineRunner;
@@ -22,6 +23,7 @@ public class SpringClient {
         new SpringApplicationBuilder(SpringClient.class).web(WebApplicationType.NONE).run(args);
     }
 
+    @Autowired
     @Bean
     public CommandLineRunner runner(ScoreService scoreService, CommentService commentService, RatingService ratingService) {
 //        return args -> ui.play();

@@ -1,5 +1,9 @@
 package sk.tuke.gamestudio.game.core.utils;
 
+import org.springframework.http.converter.json.GsonBuilderUtils;
+import org.w3c.dom.ls.LSOutput;
+import sk.tuke.gamestudio.entity.Comment;
+import sk.tuke.gamestudio.entity.Rating;
 import sk.tuke.gamestudio.game.consoleui.ConsoleUI;
 import sk.tuke.gamestudio.game.core.GameDifficulty;
 import sk.tuke.gamestudio.service.CommentService;
@@ -8,6 +12,7 @@ import sk.tuke.gamestudio.service.ScoreService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Date;
 
 import static sk.tuke.gamestudio.game.consoleui.ConsoleUI.GAME_NAME;
 
@@ -101,7 +106,9 @@ public class InputAnalyzer {
                     System.out.println("Please, enter you comment");
                     comment = reader.readLine();
                 }
-//                commentService.addComment(new Comment(userName, GAME_NAME, comment, new Date()));
+                Comment comment1 = new Comment(userName, GAME_NAME, comment, new Date());
+                commentService.addComment(comment1);
+
             } else {
                 System.out.println("Thank you, i hope you enjoyed my game. See you soon");
             }
@@ -121,7 +128,7 @@ public class InputAnalyzer {
                     System.out.println("Please, enter you comment");
                     comment = reader.readLine();
                 }
-//                ratingService.setRating(new Rating(userName, GAME_NAME, 9, new Date()));
+                ratingService.setRating(new Rating(userName, GAME_NAME, 9, new Date()));
             } else {
                 System.out.println("Thank you, i hope you enjoyed my game. See you soon");
             }

@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @NamedQuery(name = "Comment.getComments",
-        query = "SELECT c FROM Comment c WHERE c.game=:game ORDER BY c.commentedOn ")
+        query = "SELECT c FROM Comment c WHERE c.game=:game ORDER BY c.commentedOn DESC")
 public class Comment {
     @Id
     @GeneratedValue
