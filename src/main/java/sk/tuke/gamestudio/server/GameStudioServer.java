@@ -1,4 +1,4 @@
-package sk.tuke.gamestudio.game.server;
+package sk.tuke.gamestudio.server;
 
 import sk.tuke.gamestudio.service.*;
 import org.springframework.boot.SpringApplication;

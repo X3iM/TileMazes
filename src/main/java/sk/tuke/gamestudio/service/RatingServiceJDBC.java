@@ -14,7 +14,7 @@ public class RatingServiceJDBC implements RatingService {
             "UPDATE rating SET rating = ?, ratedon = ? WHERE game = ? AND player = ?;";
 
     public static final String SELECT_AVERAGE_RATING =
-            "SELECT rating FROM rating WHERE game = ? ORDER BY rating DESC LIMIT 10;";
+            "SELECT AVG(rating) FROM rating WHERE game = ?";
 
     public static final String SELECT_RATING =
             "SELECT rating FROM rating WHERE game = ? AND player = ? ORDER BY rating DESC LIMIT 10;";
@@ -37,22 +37,19 @@ public class RatingServiceJDBC implements RatingService {
 
     @Override
     public int getAverageRating(String game) throws RatingException {
-        float averageRating = 0;
-        int cnt = 0;
+        int averageRating = 0;
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             try(PreparedStatement ps = connection.prepareStatement(SELECT_AVERAGE_RATING)){
-                ps.setString(1, game);
+                System.out.println("rgest");
+                //ps.setString(1, game);
                 try(ResultSet rs = ps.executeQuery()) {
-                    while(rs.next()) {
-                        averageRating += rs.getInt(3);
-                        cnt++;
-                    }
+                    averageRating = rs.getInt(1);
                 }
             }
         } catch (SQLException e) {
             throw new ScoreException("Error loading rating", e);
         }
-        return Math.round(averageRating/cnt);
+        return averageRating;
     }
 
     @Override
@@ -79,7 +76,6 @@ public class RatingServiceJDBC implements RatingService {
         Rating rating = new Rating("jaro", "tilemazes", 90000, new java.util.Date());
         RatingServiceJDBC ratingService = new RatingServiceJDBC();
         ratingService.setRating(rating);
-        System.out.println(ratingService.getRating("tilemazes", "jaro"));
+        //System.out.println(ratingService.getAverageRating("tilemazes"));
     }
-
 }

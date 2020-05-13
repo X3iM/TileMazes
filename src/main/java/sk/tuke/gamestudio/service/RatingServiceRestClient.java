@@ -23,6 +23,6 @@ public class RatingServiceRestClient implements RatingService {
 
     @Override
     public int getRating(String game, String player) throws RatingException {
-        return Objects.requireNonNull(restTemplate.getForEntity(URL + "/" + game, Rating.class).getBody()).getRating();
+        return Objects.requireNonNull(restTemplate.getForEntity(URL + "/" + game + "/" + player, Rating.class).getBody()).getRating();
     }
 }

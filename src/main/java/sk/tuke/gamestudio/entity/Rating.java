@@ -6,9 +6,13 @@ import java.util.Date;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Rating.getAverageRating",
-                query = "SELECT r FROM Rating r WHERE r.game=:game"),
+                query = "SELECT AVG(r.rating) FROM Rating r WHERE r.game=?1"),
         @NamedQuery(name = "Rating.getRating",
-                query = "SELECT r.rating FROM Rating r WHERE r.game=?1 AND r.player=?2")
+                query = "SELECT r.rating FROM Rating r WHERE r.game=?1 AND r.player=?2"),
+        @NamedQuery(name = "Rating.updateRating",
+                query = "UPDATE Rating r SET r.rating = ?1 WHERE r.game=?2 AND r.player=?3"),
+        @NamedQuery(name = "Rating.allRating",
+                query = "SELECT r FROM Rating r WHERE r.game='tilemazes' ORDER BY r.ident DESC")
 })
 public class Rating {
     @Id

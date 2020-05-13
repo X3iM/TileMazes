@@ -1,4 +1,4 @@
-package sk.tuke.gamestudio.game.server.webservice;
+package sk.tuke.gamestudio.server.webservice;
 
 import sk.tuke.gamestudio.entity.Score;
 import sk.tuke.gamestudio.service.ScoreService;

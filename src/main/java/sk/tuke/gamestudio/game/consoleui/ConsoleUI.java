@@ -1,5 +1,6 @@
 package sk.tuke.gamestudio.game.consoleui;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import sk.tuke.gamestudio.game.core.GameDifficulty;
 import sk.tuke.gamestudio.game.core.GameState;
 import sk.tuke.gamestudio.game.core.Player;
@@ -34,8 +35,11 @@ public class ConsoleUI {
     private GameDifficulty gameDifficulty;
     private InputAnalyzer analyzer;
 
-    private final ScoreService scoreService;
+    @Autowired
+    private ScoreService scoreService;
+    @Autowired
     private RatingService ratingService;
+    @Autowired
     private CommentService commentService;
 
     private Cell[][] maze;
@@ -44,20 +48,13 @@ public class ConsoleUI {
     private int      width;
     private int      height;
 
-    public ConsoleUI(ScoreService scoreService, CommentService commentService, RatingService ratingService) {
+    public ConsoleUI() {
         player = new Player(0, 0);
         gameState = GameState.PLAYING;
         userName = "";
         analyzer = new InputAnalyzer(new BufferedReader(new InputStreamReader(System.in)));
 
         gameDifficulty = GameDifficulty.MEDIUM;
-
-        width = 2;
-        height = 2;
-
-        this.scoreService = scoreService;
-        this.commentService = commentService;
-        this.ratingService = ratingService;
     }
 
     public void play() {

@@ -1,4 +1,4 @@
-package sk.tuke.gamestudio.game.server.webservice;
+package sk.tuke.gamestudio.server.webservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

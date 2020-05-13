@@ -17,17 +17,15 @@ import java.io.IOException;
 @SpringBootApplication
 @Configuration
 @ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-        pattern = "sk.tuke.gamestudio.game.server.*"))
+        pattern = "sk.tuke.gamestudio.server.*"))
 public class SpringClient {
     public static void main(String[] args) throws IOException {
         new SpringApplicationBuilder(SpringClient.class).web(WebApplicationType.NONE).run(args);
     }
 
-    @Autowired
     @Bean
-    public CommandLineRunner runner(ScoreService scoreService, CommentService commentService, RatingService ratingService) {
-//        return args -> ui.play();
-        return args -> new ConsoleUI(scoreService, commentService, ratingService).play();
+    public CommandLineRunner runner() {
+        return args -> new ConsoleUI().play();
     }
 
     @Bean
