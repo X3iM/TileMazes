@@ -57,13 +57,6 @@
             });
         }
 
-        function rateGame() {
-            $.ajax({url: context + "api/rating/",}).done(function (json) {
-                $("#ratingList").empty();
-                $("#ratingList").append($(json));
-            });
-        }
-
         $(document).ready(refreshScore);
         // $(document).ready(refreshComment);
         $(document).ready(refreshRating);
@@ -172,6 +165,11 @@
 <h2>Average game rating: <span id="ratingList"></span></h2>
 <input type="button" onclick="refreshRating()" value="Refresh"/>
 
+<div th:if="${rating != -1}">
+    <br>
+    <h2>Your rate: <span th:text="${rating}"></span></h2>
+    <br>
+</div>
 
 <div th:if="${loggedUser != null}">
     <h2 >Rate the game: </h2>
