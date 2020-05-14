@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>TileMazes</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" th:href="@{/css/stylesheet.css}"/>
+<!--    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css">-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<!--    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />-->
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/9dcbecd42ad/integration/jqueryui/dataTables.jqueryui.js"></script>
+<!--    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">-->
+<!--    <link rel="stylesheet" href="https://cdn.datatables.net/plug-ins/9dcbecd42ad/integration/jqueryui/dataTables.jqueryui.css">-->
+
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var context = /*[[@{/}]]*/ "/";
+
+        //Ukazka pouzitia technologie AJAX - REST sluzba
+        function refreshScore() {
+            $.ajax({url: context + "api/score/tilemazes",}).done(function (json) {
+                $("#scoreList").empty();
+                for (var i in json) {
+                    var score = json[i];
+                    // let date = score.playedOn;
+                    // console.log("date " + date);
+                    // date = date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear();
+                    $("#scoreList").append($("<li>" + score.player + " " + score.points + " " + score.playedOn + "</li>"));
+                }
+            });
+        }
+
+        function refreshComment() {
+            $(document).ready(function () {
+                $('#table_id').dataTable();
+            });
+            $.ajax({url: context + "api/comment/tilemazes",}).done(function (json) {
+                $("#comList").empty();
+                for (var i in json) {
+                    var comment = json[i];
+                    $("#comList").append($("<li>" + comment.player + " " + comment.comment + " " + comment.commentedOn + "</li>"));
+                }
+            });
+        }
+
+        function refreshRating() {
+            $.ajax({url: context + "api/rating/tilemazes",}).done(function (json) {
+                $("#ratingList").empty();
+                $("#ratingList").append($(" " + "<span>" + json + "</span>"));
+            });
+        }
+
+        function rateGame() {
+            $.ajax({url: context + "api/rating/",}).done(function (json) {
+                $("#ratingList").empty();
+                $("#ratingList").append($(json));
+            });
+        }
+
+        $(document).ready(refreshScore);
+        // $(document).ready(refreshComment);
+        $(document).ready(refreshRating);
+
+        //Ukazka pouzitia technologie Web sockets
+        var stompClient = null;
+
+        function connect() {
+            var socket = new SockJS(context + "gs-guide-websocket");
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe("/topic/greetings", function (message) {
+                    receiveMessage(message.body);
+                });
+            });
+        }
+
+        function sendMessage(message) {
+            stompClient.send("/ws/hello", {}, message);
+        }
+
+        function receiveMessage(message) {
+            $("#messageDiv").text(message);
+        }
+
+        $(document).ready(connect);
+        /*]]>*/
+    </script>
+</head>
+<body>
+<h1>TileMazes</h1>
+
+<a th:href="@{/tilemazes/new}">New game</a><br/>
+
+
+<div th:if="${loggedUser != null}">
+    You are logged as <span th:text="${loggedUser}"/>.
+    <a th:href="@{/tilemazes/logout}">Logout</a>
+</div>
+
+<div th:if="${loggedUser == null}">
+    <form method="get" th:action="@{/tilemazes/login}">
+        Login: <input name="login" type="text"/>
+        <input type="submit" value="Login">
+    </form>
+</div>
+<br>
+
+<div th:utext="${@mazeController.htmlField}"/>
+
+<!--<h2>Scores</h2>-->
+<!--<ol>-->
+<!--    <li th:each="score : ${scores}">-->
+<!--        <span th:text="${score.player}"/>-->
+<!--        <span th:text="${score.points}"/>-->
+<!--    </li>-->
+<!--</ol>-->
+
+<!--<h2>Comments</h2>-->
+<!--<ol>-->
+<!--    <li th:each="comment : ${comments}">-->
+<!--        <span th:text="${comment.player}"/>-->
+<!--        <span th:text="${comment.comment}"/>-->
+<!--    </li>-->
+<!--</ol>-->
+
+<h2>10 best players:</h2>
+<input type="button" onclick="refreshScore()" value="Refresh"/>
+<ol id="scoreList"></ol>
+
+                        <!-- COMMENTS -->
+
+<h2>Comments: </h2>
+
+<table class="table table-condensed table-striped table-hover">
+    <tr>
+        <th>Player</th>
+        <th>Comment</th>
+        <th>Date</th>
+    </tr>
+    <tr th:each="comment : ${comments}">
+        <td th:text="${comment.player}">Onions</td>
+        <td th:text="${comment.comment}">2.41</td>
+        <td th:text="${#dates.format(comment.commentedOn, 'dd-MM-yyyy')}">yes</td>
+    </tr>
+</table>
+<input type="button" th:action="@{/tilemazes/commented}"  value="Refresh"/>
+<div th:if="${loggedUser != null}">
+    <h2 id="">Add your comment: </h2>
+    <form method="post" th:action="@{/tilemazes/commented}">
+        <fieldset>
+            <label for="userName1">User name: </label><br>
+            <input type="text" id="userName1" name="userName" th:attr="value=${loggedUser}"><br>
+            <label for="comment">Your comment:</label><br>
+            <input type="text" id="comment" name="comment"><br><br>
+            <input type="submit" value="Add comment!"/>
+        </fieldset>
+    </form>
+</div>
+
+<!--<input type="button" onclick="refreshComment()" value="Refresh"/>-->
+
+                    <!-- RATING -->
+
+<h2>Average game rating: <span id="ratingList"></span></h2>
+<input type="button" onclick="refreshRating()" value="Refresh"/>
+
+
+<div th:if="${loggedUser != null}">
+    <h2 >Rate the game: </h2>
+    <form method="post" th:action="@{/tilemazes/rategame}">
+        <fieldset>
+            <label for="userName">User name: </label><br>
+            <input type="text" id="userName" name="userName" th:attr="value=${loggedUser}"><br>
+            <label for="rating">Yor rate:</label><br>
+            <input type="text" id="rating" name="rating"><br><br>
+            <input type="submit" value="Rate game!"/>
+        </fieldset>
+    </form>
+</div>
+
+<h2>Websocket test</h2>
+<input type="button" onclick="sendMessage('Gamestudio ' + new Date())" value="Refresh"/>
+<div id="messageDiv"></div>
+
+</body>
+</html>
