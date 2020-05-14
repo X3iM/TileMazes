@@ -11,24 +11,20 @@ public class Player {
         this.y = y;
     }
 
-    public void move(Cell[][] maze, String move) {
-        if (!isMovePossible(maze, move)) {
-            System.out.println("You can't move throw wall(\nTry once more");
+    public void move(String move) {
+        if (move == null)
             return;
+        switch (move) {
+            case "up": x -= 1;break;
+            case "down": x += 1;break;
+            case "left": y -= 1;break;
+            case "right": y += 1;break;
         }
-
-        if (move.equals("up"))
-            x -= 1;
-        else if (move.equals("down"))
-            x += 1;
-        else if (move.equals("left"))
-            y -= 1;
-        else if (move.equals("right"))
-            y += 1;
-
     }
 
-    private boolean isMovePossible(Cell[][] maze, String move) {
+    public boolean isMovePossible(Cell[][] maze, String move) {
+        if (move == null)
+            return false;
         if (move.equals("up") && (x > 0 && !maze[x-1][y].isWallBottom()))
             return true;
         else if (move.equals("down") && (x < maze.length-1 && !maze[x][y].isWallBottom()))

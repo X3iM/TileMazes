@@ -121,7 +121,9 @@ a:link:hover, a:visited:hover  {
     padding: 10px;
 }
 
-table {
+.tablet {
+    max-width: 100%;
+    /*width: 100%;*/
     border-collapse: revert;
     border: none;
 }

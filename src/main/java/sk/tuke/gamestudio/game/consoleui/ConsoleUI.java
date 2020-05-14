@@ -79,7 +79,7 @@ public class ConsoleUI {
             displayMaze();
             time = System.nanoTime() / SECOND;
             while (gameState != GameState.SOLVED) {
-                player.move(maze, analyzer.enterPlayerMove());
+                //player.move(maze, analyzer.enterPlayerMove());
                 displayMaze();
                 changeGameState();
             }

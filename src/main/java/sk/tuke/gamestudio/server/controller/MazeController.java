@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import sk.tuke.gamestudio.entity.Comment;
 import sk.tuke.gamestudio.entity.Rating;
-import sk.tuke.gamestudio.game.consoleui.ConsoleUI;
 import sk.tuke.gamestudio.game.core.Cell;
+import sk.tuke.gamestudio.game.core.CellType;
 import sk.tuke.gamestudio.game.core.Player;
 import sk.tuke.gamestudio.game.core.mazegenerator.MazeGenerator;
 import sk.tuke.gamestudio.service.CommentException;
@@ -27,7 +27,7 @@ import java.util.Random;
 @RequestMapping("/tilemazes")
 public class MazeController {
 
-    public final int weight = 20;
+    public final int weight = 10;
 
     private Player      player;
     private Cell[][]    maze;
@@ -42,10 +42,12 @@ public class MazeController {
 
     @GetMapping()
     public String tileMazes(String row, String column, Model model) {
+        if (row == null || column == null)
+            return newGame(model);
         if (maze == null)
             newGame(model);
         else {
-
+            move(Integer.parseInt(row), Integer.parseInt(column));
             prepareModel(model);
         }
         return "tilemazes";
@@ -99,7 +101,7 @@ public class MazeController {
         sb.append("<table class='field'>\n");
         for (int row = 0; row < weight; row++) {
             sb.append("<tr>\n");
-                for (int column = 0; column < weight; column++) {
+            for (int column = 0; column < weight; column++) {
                 Cell tile = maze[row][column];
                 sb.append("<td>\n");
                     sb.append("<a href='" + String.format("%s/tilemazes?row=%s&column=%s", servletContext.getContextPath(), row, column) + "'>\n");
@@ -117,24 +119,21 @@ public class MazeController {
     private String getImageName(Cell cell) {
         StringBuilder builder = new StringBuilder();
 
-        if (player.getX() == cell.getX() && player.getY() == cell.getY()) {
+        if (player.getX() == cell.getX() && player.getY() == cell.getY())
             builder.append("player");
-            if (cell.isWallBottom())
-                builder.append("bottom");
+        if (cell.getType() == CellType.EXIT) {
+            if ()
+        } else {
+
             if (cell.isWallRight())
                 builder.append("right");
+            if (cell.isWallBottom() || cell.getX() == weight - 1)
+                builder.append("bottom");
             if (cell.getX() == 0)
                 builder.append("up");
             if (cell.getY() == 0)
                 builder.append("left");
-
-            return builder.toString();
         }
-
-        if (cell.isWallRight())
-            builder.append("right");
-        if (cell.isWallBottom())
-            builder.append("bottom");
 
         return builder.toString().isEmpty() ? "empty" : builder.toString();
     }
@@ -145,6 +144,44 @@ public class MazeController {
             model.addAttribute("comments", commentService.getComments("tilemazes"));
         } catch (CommentException e) {e.printStackTrace();}
 //        model.addAttribute("ratingList", scoreService.getTopScores("mines"));
+    }
+
+    private void move(int row, int column) {
+        if (player.getX() != row && player.getY() != column) {
+            if (new Random().nextInt(2) % 2 == 0) {
+                moveToThePos(player.getX(), column);
+            } else {
+                moveToThePos(row, player.getY());
+            }
+        } else {
+            moveToThePos(row, column);
+        }
+    }
+
+    private void moveToThePos(int row, int column) {
+        while (true) {
+            if (player.getX() == row && player.getY() == column)
+                break;
+            String move = getDirection(row, column);
+            System.out.println(move);
+            if (!player.isMovePossible(maze, move))
+                break;
+            else
+                player.move(move);
+        }
+    }
+
+    private String getDirection(int row, int column) {
+        if (player.getX() > row)
+            return "up";
+        if (player.getX() < row)
+            return "down";
+        if (player.getY() > column)
+            return "left";
+        if (player.getY() < column)
+            return "right";
+
+        return null;
     }
 
 }
