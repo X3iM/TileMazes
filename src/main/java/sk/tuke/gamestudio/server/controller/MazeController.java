@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import sk.tuke.gamestudio.entity.Comment;
 import sk.tuke.gamestudio.entity.Rating;
+import sk.tuke.gamestudio.entity.Score;
 import sk.tuke.gamestudio.game.core.Cell;
 import sk.tuke.gamestudio.game.core.CellType;
 import sk.tuke.gamestudio.game.core.GameState;
@@ -20,14 +21,17 @@ import javax.servlet.ServletContext;
 import java.util.Date;
 import java.util.Random;
 
+import static sk.tuke.gamestudio.game.consoleui.ConsoleUI.SECOND;
+
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
 @RequestMapping("/tilemazes")
 public class MazeController {
 
-    public final int    weight = 10;
+    public final int    weight = 9;
 
     private int         score;
+    private long        time;
 
     private GameState   state;
     private Player      player;
@@ -54,6 +58,12 @@ public class MazeController {
             if (state == GameState.PLAYING) {
                 move(Integer.parseInt(row), Integer.parseInt(column));
                 prepareModel(model);
+            } else {
+                if (loggedUser != null) {
+                    try {
+                        scoreService.addScore(new Score("tilemazes", loggedUser, (int) (time * 0.5f), new Date()));
+                    } catch (ScoreException e) {}
+                }
             }
         }
         return "tilemazes";
@@ -66,6 +76,7 @@ public class MazeController {
         Random rand = new Random();
         player = new Player(rand.nextInt(weight), rand.nextInt(weight));
         maze = new MazeGenerator(weight, weight, player.getX(), player.getY()).getMaze();
+        time = System.nanoTime() / SECOND;
         prepareModel(model);
         return "tilemazes";
     }
@@ -135,10 +146,12 @@ public class MazeController {
 
         if (player.getX() == cell.getX() && player.getY() == cell.getY())
             builder.append("player");
+        if (cell.getType() == CellType.EXIT)
+            System.out.println(cell.getX() + " " + cell.getY());
 
         if (cell.isWallRight())
             builder.append("right");
-        if (cell.isWallBottom() || cell.getX() == weight - 1)
+        if (cell.isWallBottom() || cell.getX() == weight - 1 && cell.getType() != CellType.EXIT)
             builder.append("bottom");
         if (cell.getX() == 0 && cell.getType() != CellType.EXIT)
             builder.append("up");
@@ -156,7 +169,6 @@ public class MazeController {
         } catch (CommentException | RatingException e) {
             e.printStackTrace();
         }
-//        model.addAttribute("ratingList", scoreService.getTopScores("mines"));
     }
 
     private void move(int row, int column) {
@@ -176,7 +188,6 @@ public class MazeController {
             if (player.getX() == row && player.getY() == column)
                 break;
             String move = getDirection(row, column);
-            System.out.println(move);
             if (!player.isMovePossible(maze, move))
                 break;
             else
